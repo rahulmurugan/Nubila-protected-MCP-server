@@ -1,0 +1,24 @@
+{
+  "name": "nubila-protected-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for Nubila Weather API with EVMAuth token-gated protection",
+  "type": "module",
+  "main": "unprotected-server.js",
+  "scripts": {
+    "start": "node unprotected-server.js",
+    "start:protected": "node protected-server.js",
+    "start:http": "node protected-server-http.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["mcp", "nubila", "weather", "evmauth", "token-gated"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@matt_dionis/evmauth-sdk-test": "^3.0.0-beta.3",
+    "@modelcontextprotocol/sdk": "latest",
+    "fastmcp": "latest",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "zod": "^3.22.0"
+  }
+}
