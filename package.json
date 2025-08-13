@@ -4,6 +4,9 @@
   "description": "MCP server for Nubila Weather API with EVMAuth token-gated protection",
   "type": "module",
   "main": "unprotected-server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "start": "node unprotected-server.js",
     "start:protected": "node protected-server.js",
