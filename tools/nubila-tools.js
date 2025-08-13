@@ -50,11 +50,11 @@ export const nubilaTools = {
           },
           current: {
             temperature: units === 'F' ? 
-              `${((weatherData.temperature * 9/5) + 32).toFixed(1)}캟` : 
-              `${weatherData.temperature}캜`,
+              `${((weatherData.temperature * 9/5) + 32).toFixed(1)}째F` : 
+              `${weatherData.temperature}째C`,
             feels_like: units === 'F' ? 
-              `${((weatherData.feels_like * 9/5) + 32).toFixed(1)}캟` : 
-              `${weatherData.feels_like}캜`,
+              `${((weatherData.feels_like * 9/5) + 32).toFixed(1)}째F` : 
+              `${weatherData.feels_like}째C`,
             humidity: `${weatherData.humidity}%`,
             wind_speed: `${weatherData.wind_speed} m/s`,
             condition: weatherData.condition,
@@ -93,14 +93,14 @@ export const nubilaTools = {
         const formattedForecast = limitedForecast.map(item => ({
           time: item.timestamp || new Date(Date.now() + item.hour * 3600000).toISOString(),
           temperature: units === 'F' ? 
-            `${((item.temperature * 9/5) + 32).toFixed(1)}캟` : 
-            `${item.temperature}캜`,
+            `${((item.temperature * 9/5) + 32).toFixed(1)}째F` : 
+            `${item.temperature}째C`,
           min_temp: units === 'F' ? 
-            `${((item.min * 9/5) + 32).toFixed(1)}캟` : 
-            `${item.min}캜`,
+            `${((item.min * 9/5) + 32).toFixed(1)}째F` : 
+            `${item.min}째C`,
           max_temp: units === 'F' ? 
-            `${((item.max * 9/5) + 32).toFixed(1)}캟` : 
-            `${item.max}캜`,
+            `${((item.max * 9/5) + 32).toFixed(1)}째F` : 
+            `${item.max}째C`,
           condition: item.condition,
           humidity: `${item.humidity}%`,
           wind_speed: `${item.wind_speed} m/s`,
@@ -158,11 +158,11 @@ export const nubilaTools = {
           },
           current_conditions: {
             temperature: units === 'F' ? 
-              `${((currentWeather.temperature * 9/5) + 32).toFixed(1)}캟` : 
-              `${currentWeather.temperature}캜`,
+              `${((currentWeather.temperature * 9/5) + 32).toFixed(1)}째F` : 
+              `${currentWeather.temperature}째C`,
             feels_like: units === 'F' ? 
-              `${((currentWeather.feels_like * 9/5) + 32).toFixed(1)}캟` : 
-              `${currentWeather.feels_like}캜`,
+              `${((currentWeather.feels_like * 9/5) + 32).toFixed(1)}째F` : 
+              `${currentWeather.feels_like}째C`,
             humidity: `${currentWeather.humidity}%`,
             wind_speed: `${currentWeather.wind_speed} m/s`,
             condition: currentWeather.condition,
@@ -170,14 +170,14 @@ export const nubilaTools = {
           },
           forecast_summary: {
             next_24h_avg_temp: units === 'F' ? 
-              `${((avgTemp * 9/5) + 32).toFixed(1)}캟` : 
-              `${avgTemp.toFixed(1)}캜`,
+              `${((avgTemp * 9/5) + 32).toFixed(1)}째F` : 
+              `${avgTemp.toFixed(1)}째C`,
             next_24h_max_temp: units === 'F' ? 
-              `${((maxTemp * 9/5) + 32).toFixed(1)}캟` : 
-              `${maxTemp.toFixed(1)}캜`,
+              `${((maxTemp * 9/5) + 32).toFixed(1)}째F` : 
+              `${maxTemp.toFixed(1)}째C`,
             next_24h_min_temp: units === 'F' ? 
-              `${((minTemp * 9/5) + 32).toFixed(1)}캟` : 
-              `${minTemp.toFixed(1)}캜`,
+              `${((minTemp * 9/5) + 32).toFixed(1)}째F` : 
+              `${minTemp.toFixed(1)}째C`,
             precipitation_chance: `${totalPrecip.toFixed(0)}%`,
             trend: determineTrend(forecastData)
           },
