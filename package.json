@@ -14,11 +14,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@matt_dionis/evmauth-sdk-test": "^3.0.0-beta.3",
-    "@modelcontextprotocol/sdk": "latest",
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "@radiustechsystems/mcp-sdk": "^1.0.0",
+    "axios": "^1.6.7",
+    "dotenv": "^16.4.1",
     "fastmcp": "latest",
-    "axios": "^1.6.0",
-    "dotenv": "^16.3.1",
-    "zod": "^3.22.0"
+    "zod": "^3.22.4"
   }
 }

@@ -6,7 +6,7 @@ An MCP (Model Context Protocol) server for the Nubila Weather API with EVMAuth t
 
 This project implements a weather data MCP server that:
 - Provides real-time weather data from Nubila's hyperlocal weather network
-- Uses EVMAuth SDK for token-gated access control
+- Uses @radiustechsystems/mcp-sdk for token-gated access control
 - Supports both local development and cloud deployment
 - Offers tiered access based on token ownership
 
@@ -29,9 +29,8 @@ nubila-protected-mcp-server/
 ├── .env.example             # Environment template
 ├── .gitignore               # Git ignore rules
 ├── unprotected-server.js    # Basic MCP server (no auth)
-├── protected-server.js      # Protected MCP server (EVMAuth)
+├── protected-server.js      # Protected MCP server (Radius MCP SDK)
 ├── protected-server-http.js # HTTP variant for deployment
-├── evmauth-import-fix.cjs   # CommonJS wrapper for SDK
 ├── tools/
 │   └── nubila-tools.js      # Weather API tools implementation
 ├── config/
@@ -204,15 +203,16 @@ Get comprehensive weather analysis with insights and recommendations.
 - Best outdoor time suggestions
 - Weather trend analysis
 
-## EVMAuth Configuration
+## Radius MCP SDK Configuration
 
 For deployment, set these environment variables in your hosting platform (Railway, Heroku, etc.):
 
 ```env
-# EVMAuth Configuration (Radius Testnet)
-EVMAUTH_CONTRACT_ADDRESS=0x5448b6c0D06C4e073fC95FE256F52E02e456d049
-EVMAUTH_CHAIN_ID=1223953
-EVMAUTH_RPC_URL=https://rpc.testnet.radius.space
+# Radius MCP SDK Configuration (Radius Testnet)
+RADIUS_CONTRACT_ADDRESS=0x9f2B42FB651b75CC3db4ef9FEd913A22BA4629Cf
+RADIUS_CHAIN_ID=1223953
+RADIUS_RPC_URL=https://rpc.testnet.radiustech.xyz
+DEBUG=false
 ```
 
 ## Deployment
@@ -253,7 +253,7 @@ The server automatically detects production environment and switches to HTTP tra
 
 This server integrates with:
 - **Nubila Weather API**: Real-time hyperlocal weather data
-- **EVMAuth SDK**: Token-gated access control on Radius testnet
+- **@radiustechsystems/mcp-sdk**: Token-gated access control on Radius testnet
 - **Model Context Protocol**: Standard interface for AI model tools
 
 ## Error Handling
@@ -269,7 +269,7 @@ The server handles various error scenarios:
 
 For issues with:
 - **Nubila API**: Check [Nubila Documentation](https://nubila-1.gitbook.io/api-docs)
-- **EVMAuth SDK**: Check SDK documentation
+- **Radius MCP SDK**: Check [@radiustechsystems/mcp-sdk](https://www.npmjs.com/package/@radiustechsystems/mcp-sdk) documentation
 - **MCP Protocol**: Check Model Context Protocol specifications
 
 ## License
@@ -278,4 +278,4 @@ ISC License - see package.json for details.
 
 ---
 
-**Note**: This server requires a valid Nubila API key and EVMAuth token ownership for protected tools. Ensure you have the necessary tokens before testing protected endpoints.
+**Note**: This server requires a valid Nubila API key and Radius MCP token ownership for protected tools. Ensure you have the necessary tokens before testing protected endpoints.
