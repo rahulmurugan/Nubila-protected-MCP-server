@@ -44,7 +44,13 @@ Object.entries(nubilaTools).forEach(([toolName, tool]) => {
     // Free tier - no protection
     execute = async (args) => {
       const result = await tool.handler(args);
-      return result;
+      // Wrap result in FastMCP expected format
+      return {
+        content: [{
+          type: "text",
+          text: typeof result === 'string' ? result : JSON.stringify(result, null, 2)
+        }]
+      };
     };
     console.log(`✅ ${toolName} - FREE (no token required)`);
   } else {
@@ -67,7 +73,14 @@ Object.entries(nubilaTools).forEach(([toolName, tool]) => {
         delete cleanArgs.__evmauth;
         
         const result = await originalHandler(cleanArgs);
-        return result;
+        
+        // Wrap result in FastMCP expected format
+        return {
+          content: [{
+            type: "text",
+            text: typeof result === 'string' ? result : JSON.stringify(result, null, 2)
+          }]
+        };
       }
       
       // PRODUCTION MODE: Normal authentication flow

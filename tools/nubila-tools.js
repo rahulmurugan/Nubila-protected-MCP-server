@@ -85,8 +85,22 @@ export const nubilaTools = {
           lon: longitude
         });
 
+        // Handle different API response formats
+        let forecastArray = forecastData;
+        if (!Array.isArray(forecastData)) {
+          // Check common nested structures
+          forecastArray = forecastData.data || forecastData.forecast || forecastData.items || [];
+          console.log('Forecast data was not array, extracted from:', Object.keys(forecastData));
+        }
+        
+        // Ensure we have an array
+        if (!Array.isArray(forecastArray)) {
+          console.error('Could not extract array from forecast data:', forecastData);
+          forecastArray = [];
+        }
+        
         // Limit forecast to requested hours
-        const limitedForecast = forecastData.slice(0, hours);
+        const limitedForecast = forecastArray.slice(0, hours);
         
         // Format the forecast data
         const formatted = formatCoordinates(latitude, longitude);
@@ -110,7 +124,7 @@ export const nubilaTools = {
         return {
           location: {
             ...formatted,
-            name: forecastData[0]?.location_name || 'Unknown Location'
+            name: limitedForecast[0]?.location_name || forecastData.location_name || 'Unknown Location'
           },
           forecast_hours: hours,
           forecast: formattedForecast,
@@ -141,11 +155,23 @@ export const nubilaTools = {
 
         const formatted = formatCoordinates(latitude, longitude);
         
+        // Handle different API response formats for forecast
+        let forecastArray = forecastData;
+        if (!Array.isArray(forecastData)) {
+          forecastArray = forecastData.data || forecastData.forecast || forecastData.items || [];
+        }
+        
+        // Ensure we have an array
+        if (!Array.isArray(forecastArray)) {
+          console.error('Could not extract array from forecast data:', forecastData);
+          forecastArray = [];
+        }
+        
         // Analyze the data based on purpose
-        const analysis = analyzeWeatherData(currentWeather, forecastData, purpose);
+        const analysis = analyzeWeatherData(currentWeather, forecastArray, purpose);
         
         // Get next 24 hours forecast summary
-        const next24Hours = forecastData.slice(0, 24);
+        const next24Hours = forecastArray.slice(0, 24);
         const avgTemp = next24Hours.reduce((sum, item) => sum + item.temperature, 0) / next24Hours.length;
         const maxTemp = Math.max(...next24Hours.map(item => item.max || item.temperature));
         const minTemp = Math.min(...next24Hours.map(item => item.min || item.temperature));
@@ -179,7 +205,7 @@ export const nubilaTools = {
               `${((minTemp * 9/5) + 32).toFixed(1)}°F` : 
               `${minTemp.toFixed(1)}°C`,
             precipitation_chance: `${totalPrecip.toFixed(0)}%`,
-            trend: determineTrend(forecastData)
+            trend: determineTrend(forecastArray)
           },
           analysis: analysis,
           generated_at: new Date().toISOString()
