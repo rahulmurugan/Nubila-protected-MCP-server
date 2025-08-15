@@ -50,9 +50,27 @@ Object.entries(nubilaTools).forEach(([toolName, tool]) => {
   } else {
     // Protected tiers - wrap with Radius MCP SDK
     const originalHandler = tool.handler;
+    
+    // Check for DEMO_MODE
+    const DEMO_MODE = process.env.DEMO_MODE === 'true';
+    
     execute = async (args) => {
       console.log(`\n🔍 [${toolName}] Incoming args:`, JSON.stringify(args, null, 2));
       
+      // DEMO MODE: Bypass authentication entirely
+      if (DEMO_MODE) {
+        console.log(`🎮 [${toolName}] DEMO MODE ACTIVE - Bypassing authentication`);
+        console.log(`✅ [${toolName}] Token ID ${tokenId} requirement bypassed for demo`);
+        
+        // Call the original handler directly with clean args
+        const cleanArgs = { ...args };
+        delete cleanArgs.__evmauth;
+        
+        const result = await originalHandler(cleanArgs);
+        return result;
+      }
+      
+      // PRODUCTION MODE: Normal authentication flow
       // Check if __evmauth is present
       if (args.__evmauth) {
         console.log(`✅ [${toolName}] __evmauth present in args`);
@@ -165,6 +183,9 @@ async function main() {
   console.log('  - Premium (Token 3): getWindAndPressure, searchCitiesByCountry');
   console.log('  - Pro (Token 5): getHealthCheck\n');
   
+  // Check DEMO_MODE status
+  const DEMO_MODE = process.env.DEMO_MODE === 'true';
+  
   // For Railway deployment - use HTTP transport
   const isProduction = process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === 'production';
   const port = parseInt(process.env.PORT) || 3001;
@@ -183,7 +204,16 @@ async function main() {
     console.log(`✅ FastMCP server running on http://0.0.0.0:${port}`);
     console.log(`📍 MCP endpoint: http://0.0.0.0:${port}/mcp`);
     console.log(`🔍 Health check: http://0.0.0.0:${port}/health`);
-    console.log(`🔐 Radius MCP protection: Enabled`);
+    
+    if (DEMO_MODE) {
+      console.log('🎮 DEMO MODE: ACTIVE - Authentication bypassed for all protected tools');
+      console.log('⚠️  WARNING: This mode is for demonstration only. Do not use in production!');
+    } else {
+      console.log(`🔐 Radius MCP protection: Enabled`);
+      console.log('🔗 Contract:', process.env.RADIUS_CONTRACT_ADDRESS || '0x9f2B42FB651b75CC3db4ef9FEd913A22BA4629Cf');
+      console.log('🔗 Chain ID:', process.env.RADIUS_CHAIN_ID || 1223953);
+    }
+    
     console.log(`🌐 Ready to accept connections`);
     
     // Keep process alive
@@ -195,6 +225,13 @@ async function main() {
     // Local development - stdio
     await server.start();
     console.log('✨ Protected Nubila MCP Server is running (stdio)');
+    
+    if (DEMO_MODE) {
+      console.log('🎮 DEMO MODE: ACTIVE - Authentication bypassed for all protected tools');
+      console.log('⚠️  WARNING: This mode is for demonstration only. Do not use in production!');
+    } else {
+      console.log('🔐 Radius MCP protection: Enabled');
+    }
   }
 }
 
