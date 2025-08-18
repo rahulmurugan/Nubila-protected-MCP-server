@@ -74,7 +74,7 @@ Object.entries(nubilaTools).forEach(([toolName, tool]) => {
         
         const result = await originalHandler(cleanArgs);
         
-        // Wrap result in FastMCP expected format
+        // In DEMO MODE, we need to wrap the result since we're bypassing the SDK
         return {
           content: [{
             type: "text",
@@ -130,7 +130,7 @@ Object.entries(nubilaTools).forEach(([toolName, tool]) => {
         // Call the protected handler with the MCP request
         const response = await protectedHandler(mcpRequest);
         
-        // Return the response directly (like the timestamp example)
+        // Return the SDK response directly (it's already in MCP format)
         return response;
       } catch (error) {
         console.error(`❌ [${toolName}] Error:`, error.message);
