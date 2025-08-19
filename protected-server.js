@@ -22,7 +22,7 @@ const radius = new RadiusMcpSdk({
 
 // Create FastMCP server
 const server = new FastMCP({
-  name: 'nubila-protected-sdk-test',
+  name: 'nubila-mcp-server',
   version: '1.0.0',
   description: 'Nubila MCP server protected with @radiustechsystems/mcp-sdk',
   // NOTE: Authentication handler is called BEFORE tools execute
