@@ -117,13 +117,8 @@ Object.entries(nubilaTools).forEach(([toolName, tool]) => {
         
         const result = await originalHandler(cleanArgs);
         
-        // Return in MCP format with content array
-        return {
-          content: [{
-            type: "text",
-            text: result
-          }]
-        };
+        // Return the raw result - let FastMCP handle formatting
+        return result;
       });
       
       try {
