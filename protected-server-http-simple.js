@@ -109,6 +109,31 @@ Object.entries(nubilaTools).forEach(([toolName, tool]) => {
     try {
       // Call the protected handler with the MCP request
       const response = await protectedHandler(mcpRequest);
+      if (response && typeof response === 'object') {
+          if ('content' in response && Array.isArray(response.content)) {
+            // Check if this is an error response from Radius
+            const firstContent = response.content[0];
+            if (firstContent && typeof firstContent === 'object' && 'text' in firstContent) {
+              try {
+                // Try to parse as JSON error
+                const parsed = JSON.parse(firstContent.text);
+                if (parsed.error) {
+                  // This is a Radius error - throw it properly so Claude gets the full error info
+                  throw new Error(firstContent.text);
+                }
+                return response;
+              } catch (e) {
+                // Not JSON, it's the actual text
+                return response;
+              }
+            }
+          } else if ('error' in response && response.error) {
+            // Error - throw with proper message
+            const error = response.error;
+            throw new Error(error.message || 'Authentication failed');
+          }
+        }
+        
       return response;
     } catch (error) {
       console.error(`❌ [${toolName}] Error:`, error.message);
