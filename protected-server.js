@@ -123,7 +123,7 @@ Object.entries(nubilaTools).forEach(([toolName, tool]) => {
         return {
           content: [{
             type: "text",
-            text: result
+            text: JSON.stringify(result)
           }]
         };
       });
@@ -146,9 +146,10 @@ Object.entries(nubilaTools).forEach(([toolName, tool]) => {
                   // This is a Radius error - throw it properly so Claude gets the full error info
                   throw new Error(firstContent.text);
                 }
+                return response;
               } catch (e) {
-                // Not JSON, it's the actual result
-                return firstContent.text;
+                // Not JSON, it's the actual text
+                return response;
               }
             }
           } else if ('error' in response && response.error) {
