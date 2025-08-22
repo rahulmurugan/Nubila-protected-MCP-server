@@ -36,10 +36,11 @@ export const nubilaTools = {
     }),
     handler: async ({ latitude, longitude, units }) => {
       try {
-        const weatherData = await makeNubilaRequest('/api/v1/weather', {
+        const requestData = await makeNubilaRequest('/api/v1/weather', {
           lat: latitude,
           lon: longitude
         });
+        const weatherData = requestData.ok ? requestData.data : {};
 
         // Format the response
         const formatted = formatCoordinates(latitude, longitude);
