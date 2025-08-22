@@ -5,8 +5,10 @@ import { z } from 'zod';
 import { nubilaTools, TOKEN_REQUIREMENTS } from './tools/nubila-tools.js';
 import dotenv from 'dotenv';
 import { logToFile } from './logger.js';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
-dotenv.config({path: dotenv.config({path: `${path.dirname(fileURLToPath(import.meta.url))}/.env`});});
+dotenv.config({path: dotenv.config({path: `${path.dirname(fileURLToPath(import.meta.url))}/.env`})});
 process.env.LOG_TO_CONSOLE = false;
 
 // Initialize Radius MCP SDK - Using environment variables from Railway
