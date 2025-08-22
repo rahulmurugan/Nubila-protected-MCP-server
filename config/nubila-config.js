@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import axios from 'axios';
+import { logToFile } from '../logger.js';
 
 // Load environment variables
 dotenv.config();
@@ -26,7 +27,7 @@ export const nubilaApi = axios.create({
 export async function makeNubilaRequest(endpoint, params = {}) {
   // If no API key, return mock data for demo
   if (!NUBILA_API_KEY) {
-    console.log('⚠️ No Nubila API key - returning mock data for demo');
+    logToFile('⚠️ No Nubila API key - returning mock data for demo');
     return getMockData(endpoint, params);
   }
   

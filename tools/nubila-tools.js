@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { makeNubilaRequest, formatCoordinates } from '../config/nubila-config.js';
+import { logToFile } from '../logger.js';
 
 // Token requirements for each tool
 export const TOKEN_REQUIREMENTS = {
@@ -90,7 +91,7 @@ export const nubilaTools = {
         if (!Array.isArray(forecastData)) {
           // Check common nested structures
           forecastArray = forecastData.data || forecastData.forecast || forecastData.items || [];
-          console.log('Forecast data was not array, extracted from:', Object.keys(forecastData));
+          logToFile(`Forecast data was not array, extracted from: ${JSON.stringify(Object.keys(forecastData))}`);
         }
         
         // Ensure we have an array
