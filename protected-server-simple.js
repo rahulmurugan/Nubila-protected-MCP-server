@@ -4,8 +4,13 @@ import { RadiusMcpSdk } from '@radiustechsystems/mcp-sdk';
 import { z } from 'zod';
 import { nubilaTools, TOKEN_REQUIREMENTS } from './tools/nubila-tools.js';
 import dotenv from 'dotenv';
+import { logToFile } from './logger.js';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
-dotenv.config();
+dotenv.config({path: dotenv.config({path: `${path.dirname(fileURLToPath(import.meta.url))}/.env`})});
+process.env.LOG_TO_CONSOLE = false;
+
 
 // Environment configuration
 const EVMAUTH_CONTRACT_ADDRESS = process.env.RADIUS_CONTRACT_ADDRESS || "0x9f2B42FB651b75CC3db4ef9FEd913A22BA4629Cf";
@@ -24,21 +29,21 @@ const server = new FastMCP({
 });
 
 // Register all tools
-console.log('🚀 Starting Nubila MCP Server (Protected with SDK)');
-console.log('🔐 Using @radiustechsystems/mcp-sdk package\n');
-console.log('📝 Registering protected tools...\n');
+logToFile('🚀 Starting Nubila MCP Server (Protected with SDK)');
+logToFile('🔐 Using @radiustechsystems/mcp-sdk package\n');
+logToFile('📝 Registering protected tools...\n');
 
 Object.entries(nubilaTools).forEach(([toolName, tool]) => {
   const tokenId = TOKEN_REQUIREMENTS[toolName];
   
   // Create the authentication wrapper for each tool
   const authenticatedHandler = async (args) => {
-    console.log(`\n🔍 [${toolName}] Incoming args:`, JSON.stringify(args, null, 2));
+    logToFile(`\n🔍 [${toolName}] Incoming args: ${JSON.stringify(args, null, 2)}`);
     
     // DEMO MODE: Bypass authentication
     if (DEMO_MODE) {
-      console.log(`🎮 [${toolName}] DEMO MODE ACTIVE - Bypassing authentication`);
-      console.log(`✅ [${toolName}] Token ID ${tokenId} requirement bypassed for demo`);
+      logToFile(`🎮 [${toolName}] DEMO MODE ACTIVE - Bypassing authentication`);
+      logToFile(`✅ [${toolName}] Token ID ${tokenId} requirement bypassed for demo`);
       
       // Call the tool handler directly
       const result = await tool.handler(args);
@@ -66,15 +71,15 @@ Object.entries(nubilaTools).forEach(([toolName, tool]) => {
     // Protected tier - use Radius SDK
     // Check if __evmauth is present
     if (args.__evmauth) {
-      console.log(`✅ [${toolName}] __evmauth present in args`);
+      logToFile(`✅ [${toolName}] __evmauth present in args`);
       try {
         const authProof = typeof args.__evmauth === 'string' ? JSON.parse(args.__evmauth) : args.__evmauth;
-        console.log(`🔐 [${toolName}] Auth proof signature length:`, authProof.signature?.length);
+        logToFile(`🔐 [${toolName}] Auth proof signature length: ${authProof.signature?.length}`);
       } catch (e) {
-        console.log(`⚠️ [${toolName}] Failed to parse auth proof:`, e);
+        logToFile(`⚠️ [${toolName}] Failed to parse auth proof: ${e}`);
       }
     } else {
-      console.log(`❌ [${toolName}] No __evmauth in args`);
+      logToFile(`❌ [${toolName}] No __evmauth in args`);
     }
     
     // Create MCP request structure expected by Radius SDK
@@ -109,9 +114,34 @@ Object.entries(nubilaTools).forEach(([toolName, tool]) => {
     try {
       // Call the protected handler with the MCP request
       const response = await protectedHandler(mcpRequest);
+      // Handle the response
+      if (response && typeof response === 'object') {
+        if ('content' in response && Array.isArray(response.content)) {
+          // Check if this is an error response from Radius
+          const firstContent = response.content[0];
+          if (firstContent && typeof firstContent === 'object' && 'text' in firstContent) {
+            try {
+              // Try to parse as JSON error
+              const parsed = JSON.parse(firstContent.text);
+              if (parsed.error) {
+                // This is a Radius error - throw it properly so Claude gets the full error info
+                throw new Error(firstContent.text);
+              }
+              return response;
+            } catch (e) {
+              // Not JSON, it's the actual text
+              return response;
+            }
+          }
+        } else if ('error' in response && response.error) {
+          // Error - throw with proper message
+          const error = response.error;
+          throw new Error(error.message || 'Authentication failed');
+        }
+      }
       return response;
     } catch (error) {
-      console.error(`❌ [${toolName}] Error:`, error.message);
+      logToFile(`❌ [${toolName}] Error: ${error.message}`);
       throw error;
     }
   };
@@ -138,36 +168,36 @@ Object.entries(nubilaTools).forEach(([toolName, tool]) => {
   });
   
   if (tokenId === 0) {
-    console.log(`✅ ${toolName} - FREE (no token required)`);
+    logToFile(`✅ ${toolName} - FREE (no token required)`);
   } else {
-    console.log(`🔒 ${toolName} - Protected with Token ID ${tokenId}`);
+    logToFile(`🔒 ${toolName} - Protected with Token ID ${tokenId}`);
   }
 });
 
 // Start the server
 async function main() {
-  console.log('\n🌟 All tools registered with protection!');
-  console.log('\n📊 Token Requirements:');
-  console.log('  - Free (Token 0): ping');
-  console.log('  - Basic (Token 1): getCurrentWeather, getWeatherForecast');
-  console.log('  - Premium (Token 3): getWindAndPressure, searchCitiesByCountry');
-  console.log('  - Pro (Token 5): getHealthCheck\n');
+  logToFile('\n🌟 All tools registered with protection!');
+  logToFile('\n📊 Token Requirements:');
+  logToFile('  - Free (Token 0): ping');
+  logToFile('  - Basic (Token 1): getCurrentWeather, getWeatherForecast');
+  logToFile('  - Premium (Token 3): getWindAndPressure, searchCitiesByCountry');
+  logToFile('  - Pro (Token 5): getHealthCheck\n');
   
   // Check DEMO_MODE status
   if (DEMO_MODE) {
-    console.log('🎮 DEMO MODE: ACTIVE - Authentication bypassed for all protected tools');
-    console.log('⚠️  WARNING: This mode is for demonstration only. Do not use in production!');
+    logToFile('🎮 DEMO MODE: ACTIVE - Authentication bypassed for all protected tools');
+    logToFile('⚠️  WARNING: This mode is for demonstration only. Do not use in production!');
   } else {
-    console.log('🔐 Radius MCP protection: Enabled');
-    console.log('🔗 Contract:', EVMAUTH_CONTRACT_ADDRESS);
+    logToFile('🔐 Radius MCP protection: Enabled');
+    logToFile(`🔗 Contract: ${EVMAUTH_CONTRACT_ADDRESS}`);
   }
   
   // For local development - use stdio
   await server.start();
-  console.log('✨ Protected Nubila MCP Server is running (stdio)');
+  logToFile('✨ Protected Nubila MCP Server is running (stdio)');
 }
 
 main().catch((error) => {
-  console.error('❌ Server failed to start:', error);
+  logToFile(`❌ Server failed to start: ${error}`);
   process.exit(1);
 });

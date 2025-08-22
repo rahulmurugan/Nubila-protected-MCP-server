@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { makeNubilaRequest, formatCoordinates } from '../config/nubila-config.js';
+import { logToFile } from '../logger.js';
 
 // Token requirements for each tool
 export const TOKEN_REQUIREMENTS = {
@@ -35,10 +36,11 @@ export const nubilaTools = {
     }),
     handler: async ({ latitude, longitude, units }) => {
       try {
-        const weatherData = await makeNubilaRequest('/api/v1/weather', {
+        const requestData = await makeNubilaRequest('/api/v1/weather', {
           lat: latitude,
           lon: longitude
         });
+        const weatherData = requestData.ok ? requestData.data : {};
 
         // Format the response
         const formatted = formatCoordinates(latitude, longitude);
@@ -90,7 +92,7 @@ export const nubilaTools = {
         if (!Array.isArray(forecastData)) {
           // Check common nested structures
           forecastArray = forecastData.data || forecastData.forecast || forecastData.items || [];
-          console.log('Forecast data was not array, extracted from:', Object.keys(forecastData));
+          logToFile(`Forecast data was not array, extracted from: ${JSON.stringify(Object.keys(forecastData))}`);
         }
         
         // Ensure we have an array
@@ -148,10 +150,18 @@ export const nubilaTools = {
     handler: async ({ latitude, longitude, purpose, units }) => {
       try {
         // Get both current weather and forecast
-        const [currentWeather, forecastData] = await Promise.all([
+        const [currentWeatherResponse, forecastDataResponse] = await Promise.all([
           makeNubilaRequest('/api/v1/weather', { lat: latitude, lon: longitude }),
           makeNubilaRequest('/api/v1/forecast', { lat: latitude, lon: longitude })
         ]);
+        let currentWeather = {};
+        let forecastData = [];
+        if (currentWeatherResponse && typeof currentWeatherResponse === 'object' && "data" in currentWeatherResponse) {
+          currentWeather = currentWeatherResponse.data;
+        }
+        if (forecastDataResponse && typeof forecastDataResponse === 'object' && "data" in forecastDataResponse) {
+          forecastData = forecastDataResponse.data;
+        }
 
         const formatted = formatCoordinates(latitude, longitude);
         
