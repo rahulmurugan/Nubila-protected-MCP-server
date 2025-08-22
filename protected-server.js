@@ -161,8 +161,7 @@ Object.entries(nubilaTools).forEach(([toolName, tool]) => {
           }
         }
         
-        // Default error
-        throw new Error('Unexpected response from authentication');
+        return response;
       } catch (error) {
         console.error(`❌ [${toolName}] Error:`, error.message);
         throw error;
