@@ -150,10 +150,18 @@ export const nubilaTools = {
     handler: async ({ latitude, longitude, purpose, units }) => {
       try {
         // Get both current weather and forecast
-        const [currentWeather, forecastData] = await Promise.all([
+        const [currentWeatherResponse, forecastDataResponse] = await Promise.all([
           makeNubilaRequest('/api/v1/weather', { lat: latitude, lon: longitude }),
           makeNubilaRequest('/api/v1/forecast', { lat: latitude, lon: longitude })
         ]);
+        let currentWeather = {};
+        let forecastData = [];
+        if (currentWeatherResponse && typeof currentWeatherResponse === 'object' && "data" in currentWeatherResponse) {
+          currentWeather = currentWeatherResponse.data;
+        }
+        if (forecastDataResponse && typeof forecastDataResponse === 'object' && "data" in forecastDataResponse) {
+          forecastData = forecastDataResponse.data;
+        }
 
         const formatted = formatCoordinates(latitude, longitude);
         
