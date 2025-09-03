@@ -8,11 +8,11 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "start": "node unprotected-server.js",
+    "start": "DEMO_MODE=true node unprotected-server.js",
+    "start:demo": "DEMO_MODE=true node unprotected-server.js",
+    "start:unprotected": "node unprotected-server.js",
     "start:protected": "node protected-server-simple.js",
     "start:http": "node protected-server-http-simple.js",
-    "start:protected-old": "node protected-server.js",
-    "start:http-old": "node protected-server-http.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["mcp", "nubila", "weather", "evmauth", "token-gated"],
